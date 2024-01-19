@@ -7,3 +7,7 @@ certifier
 /contrib/staging/
 **/*.sha256
 .vagrant
+
+template
+build
+.secrets

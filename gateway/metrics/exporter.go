@@ -69,6 +69,9 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 		e.metricOptions.ServiceReplicasGauge.
 			WithLabelValues(serviceName).
 			Set(float64(service.Replicas))
+
+		e.metricOptions.GatewayFunctionInvocation.GetMetricWithLabelValues(serviceName, "200")
+
 	}
 
 	e.metricOptions.ServiceReplicasGauge.Collect(ch)

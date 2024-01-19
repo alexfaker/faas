@@ -43,7 +43,7 @@ func MakeAlertHandler(service scaling.ServiceQuery, defaultNamespace string) htt
 			log.Println(err)
 			return
 		}
-
+		log.Printf("Received alert: %+v\n", req)
 		errors := handleAlerts(req, service, defaultNamespace)
 		if len(errors) > 0 {
 			log.Println(errors)
@@ -63,6 +63,7 @@ func MakeAlertHandler(service scaling.ServiceQuery, defaultNamespace string) htt
 func handleAlerts(req requests.PrometheusAlert, service scaling.ServiceQuery, defaultNamespace string) []error {
 	var errors []error
 	for _, alert := range req.Alerts {
+		log.Printf("Handling alert: %+v\n", alert)
 		if err := scaleService(alert, service, defaultNamespace); err != nil {
 			log.Println(err)
 			errors = append(errors, err)
@@ -81,6 +82,12 @@ func scaleService(alert requests.PrometheusInnerAlert, service scaling.ServiceQu
 		queryResponse, getErr := service.GetReplicas(serviceName, namespace)
 		if getErr == nil {
 			status := alert.Status
+
+			// 添加这个判断，如果告警名字是APINoInvocation，就直接缩到0
+			if alert.Labels.AlertName == "APINoInvocation" {
+				status = "resolved"
+				log.Printf("[Scale] function=%s %d => 0.\n", serviceName, queryResponse.Replicas)
+			}
 
 			newReplicas := CalculateReplicas(status, queryResponse.Replicas, uint64(queryResponse.MaxReplicas), queryResponse.MinReplicas, queryResponse.ScalingFactor)
 

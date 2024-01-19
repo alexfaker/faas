@@ -99,7 +99,7 @@ func (s ExternalServiceQuery) GetReplicas(serviceName, serviceNamespace string) 
 			return emptyServiceQueryResponse, err
 		}
 
-		// log.Printf("GetReplicas [%s.%s] took: %fs", serviceName, serviceNamespace, time.Since(start).Seconds())
+		log.Printf("GetReplicas [%s.%s] took: %fs", serviceName, serviceNamespace, time.Since(start).Seconds())
 
 	} else {
 		log.Printf("GetReplicas [%s.%s] took: %.4fs, code: %d\n", serviceName, serviceNamespace, time.Since(start).Seconds(), res.StatusCode)
